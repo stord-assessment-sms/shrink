@@ -77,8 +77,20 @@ defmodule Shrink.MixProject do
         "tailwind shrink --minify",
         "esbuild shrink --minify",
         "phx.digest"
+      ],
+      ci: [
+        "format --check-formatted",
+        "compile --all-warnings --warnings-as-errors",
+        "test --cover",
+        "dialyzer",
+        "credo",
+        "xref graph --label compile --format cycles --fail-above 0"
       ]
     ]
+  end
+
+  def cli do
+    [preferred_envs: [ci: :test]]
   end
 
   defp coverage do

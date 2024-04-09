@@ -1,0 +1,40 @@
+name: Tests
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - features/*
+
+env:
+  MIX_ENV: test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:15.6-alpine
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1.17
+        with:
+          version-file: .tool-versions
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix compile --all-warnings --warnings-as-errors
+      - run: mix test --cover
+      - run: mix dialyzer --plt
+      - run: mix dialyzer
+      - run: mix credo suggest --format oneline
+      - run: mix xref graph --label compile --format cycles --fail-above 0
+      - run: mix excellent_migrations.check_safety
