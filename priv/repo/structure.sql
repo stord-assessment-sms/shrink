@@ -35,6 +35,20 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: link_visits; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.link_visits (
+    link_id uuid NOT NULL,
+    date date NOT NULL,
+    hour smallint NOT NULL,
+    count integer DEFAULT 0,
+    CONSTRAINT positive_count CHECK ((count >= 0)),
+    CONSTRAINT valid_hour CHECK (((hour >= 0) AND (hour <= 23)))
+);
+
+
+--
 -- Name: links; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -78,6 +92,14 @@ COMMENT ON TABLE public.users IS 'Placeholder table for stubbed authz/authn impl
 
 
 --
+-- Name: link_visits link_visits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.link_visits
+    ADD CONSTRAINT link_visits_pkey PRIMARY KEY (link_id, date, hour);
+
+
+--
 -- Name: links links_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -99,6 +121,13 @@ ALTER TABLE ONLY public.schema_migrations
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: link_visits_link_id_date_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX link_visits_link_id_date_index ON public.link_visits USING btree (link_id, date);
 
 
 --
@@ -130,6 +159,14 @@ CREATE UNIQUE INDEX users_email_index ON public.users USING btree (email);
 
 
 --
+-- Name: link_visits id; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.link_visits
+    ADD CONSTRAINT id FOREIGN KEY (link_id) REFERENCES public.links(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
 -- Name: links links_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -144,3 +181,4 @@ ALTER TABLE ONLY public.links
 INSERT INTO public."schema_migrations" (version) VALUES (20240409135116);
 INSERT INTO public."schema_migrations" (version) VALUES (20240409143510);
 INSERT INTO public."schema_migrations" (version) VALUES (20240409201910);
+INSERT INTO public."schema_migrations" (version) VALUES (20240409202044);
