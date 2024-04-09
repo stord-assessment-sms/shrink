@@ -17,6 +17,29 @@ defmodule ShrinkWeb.LinkControllerTest do
 
       assert form["input[name='link[original_url]']"] != nil
     end
+
+    test "renders recent links table", %{conn: conn, user: user} do
+      for _n <- 1..3 do
+        {:ok, link} = Links.create_link(user.id, Faker.Internet.url())
+        link
+      end
+
+      conn = get(conn, ~p"/")
+      resp = html_response(conn, 200)
+
+      assert {:ok, doc} = Floki.parse_document(resp)
+      assert table = Floki.find(doc, "tbody#recent-links")
+
+      for link <- Links.list_recent_links_by_user_id(user.id) do
+        assert [anchor] = Floki.find(table, "a[href='#{link.original_url}']")
+        assert Floki.text(anchor) == link.original_url
+
+        assert [anchor] = Floki.find(table, "a[href$='#{link.slug}']")
+        assert Floki.text(anchor) == link.slug
+        expected = "#{conn.scheme}://#{conn.host}/#{link.slug}"
+        assert Floki.attribute(anchor, "href") == [expected]
+      end
+    end
   end
 
   describe "new without authentication" do
@@ -50,6 +73,16 @@ defmodule ShrinkWeb.LinkControllerTest do
       assert Enum.find(flashes, fn text ->
                text =~ ~r/Link \S+ created successfully./
              end)
+    end
+
+    test "renders recent links table", %{conn: conn} do
+      url = params_for(:link).original_url
+      conn = post(conn, ~p"/links", %{"link" => %{"original_url" => url}})
+      resp = html_response(conn, 201)
+
+      assert {:ok, doc} = Floki.parse_document(resp)
+      assert table = Floki.find(doc, "tbody#recent-links")
+      assert Floki.find(table, "a[href='#{url}']") != []
     end
   end
 

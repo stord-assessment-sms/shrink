@@ -8,7 +8,9 @@ defmodule ShrinkWeb.LinkController do
 
   def new(conn, _params) do
     changeset = Links.change_link(%Link{})
-    render(conn, :new, changeset: changeset)
+    user_id = get_in(conn.private, [:current_user, Access.key(:id)])
+    links = Links.list_recent_links_by_user_id(user_id)
+    render(conn, :new, changeset: changeset, recent_links: links)
   end
 
   def create(conn, %{"link" => %{"original_url" => url}}) do

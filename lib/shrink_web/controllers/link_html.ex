@@ -10,4 +10,12 @@ defmodule ShrinkWeb.LinkHTML do
   attr :action, :string, required: true
 
   def link_form(assigns)
+
+  attr :conn, :map, required: true
+  attr :links, :list, required: true
+  def recent_links_table(assigns)
+
+  defp short_url(conn, link) do
+    URI.to_string(%URI{scheme: to_string(conn.scheme), host: conn.host, port: conn.port, path: "/" <> link.slug})
+  end
 end
