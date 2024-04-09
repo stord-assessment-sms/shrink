@@ -9,7 +9,8 @@ defmodule Shrink.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: dialyzer()
     ]
   end
 
@@ -76,6 +77,16 @@ defmodule Shrink.MixProject do
         "esbuild shrink --minify",
         "phx.digest"
       ]
+    ]
+  end
+
+  defp dialyzer do
+    [
+      ignore_warnings: ".dialyzer_ignore.exs",
+      list_unused_filters: true,
+      plt_add_apps: [:ex_unit, :mix],
+      plt_core_path: "_build/plts",
+      plt_local_path: "_build/plts"
     ]
   end
 end
