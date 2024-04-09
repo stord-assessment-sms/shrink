@@ -39,6 +39,7 @@ defmodule Shrink.MixProject do
       {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
       {:dns_cluster, "~> 0.1.1"},
       {:ecto_sql, "~> 3.10"},
+      {:ecto_psql_extras, "~> 0.7.15"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
