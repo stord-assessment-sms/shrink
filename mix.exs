@@ -10,7 +10,8 @@ defmodule Shrink.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      dialyzer: dialyzer()
+      dialyzer: dialyzer(),
+      test_coverage: coverage()
     ]
   end
 
@@ -77,6 +78,26 @@ defmodule Shrink.MixProject do
         "esbuild shrink --minify",
         "phx.digest"
       ]
+    ]
+  end
+
+  defp coverage do
+    [
+      ignore_modules: [
+        # Codegen
+        ShrinkWeb.Gettext,
+        # Deploy-only
+        Shrink.Release,
+        # False-positive
+        Shrink.DataCase,
+        Shrink.Repo,
+        ShrinkWeb.ConnCase,
+        # Low-value
+        ShrinkWeb.CoreComponents,
+        ShrinkWeb.Layouts,
+        ~r/^ShrinkWeb\.\w+HTML$/
+      ],
+      summary: [threshold: 75]
     ]
   end
 
