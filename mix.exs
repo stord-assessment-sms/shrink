@@ -34,6 +34,7 @@ defmodule Shrink.MixProject do
     [
       {:bandit, "~> 1.2"},
       {:credo, "~> 1.7.5", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
       {:dns_cluster, "~> 0.1.1"},
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
