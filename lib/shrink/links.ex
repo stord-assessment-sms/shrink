@@ -5,8 +5,11 @@ defmodule Shrink.Links do
 
   alias Shrink.Links.Link
   alias Shrink.Links.Query
+  alias Shrink.Links.Visit
   alias Shrink.Repo
   alias Shrink.Users.User
+
+  require Logger
 
   @doc "Create a changeset for a `Link`, defaulting to no attributes"
   @spec change_link(Link.t(), map()) :: Ecto.Changeset.t()
@@ -34,5 +37,33 @@ defmodule Shrink.Links do
   @spec get_link_by_slug(Link.slug()) :: Link.t() | nil
   def get_link_by_slug(slug) do
     Repo.one(Query.link_by_slug(slug))
+  end
+
+  @doc "Record a visit to a `Link` by its slug, if that Link exists"
+  @spec visit_link_by_slug(Link.slug()) :: Link.url() | nil
+  def visit_link_by_slug(slug) do
+    fn repo ->
+      case repo.one(Query.link_by_slug(slug)) do
+        nil ->
+          nil
+
+        link ->
+          repo.insert(%Visit{link_id: link.id, date: Date.utc_today(), hour: Time.utc_now().hour, count: 1},
+            conflict_target: [:link_id, :date, :hour],
+            on_conflict: [inc: [count: 1]]
+          )
+
+          link.original_url
+      end
+    end
+    |> Repo.transaction()
+    |> case do
+      {:ok, maybe_url} ->
+        maybe_url
+
+      {:error, _changeset} ->
+        Logger.error("Could not record visit for slug #{slug}")
+        nil
+    end
   end
 end

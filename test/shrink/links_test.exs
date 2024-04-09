@@ -2,6 +2,7 @@ defmodule Shrink.LinksTest do
   use Shrink.DataCase, async: true
 
   alias Shrink.Links
+  alias Shrink.Links.Visit
 
   describe "create_link/1" do
     setup do
@@ -55,6 +56,47 @@ defmodule Shrink.LinksTest do
     test "returns nil if link not found" do
       slug = "abcDEF"
       assert Links.get_link_by_slug(slug) == nil
+    end
+  end
+
+  describe "visit_link_by_slug/1" do
+    setup do
+      user = insert(:user)
+      {:ok, link} = Links.create_link(user.id, Faker.Internet.url())
+      %{link: link, user: user}
+    end
+
+    test "returns link if match exists", %{link: link} do
+      assert Links.visit_link_by_slug(link.slug) == link.original_url
+    end
+
+    test "returns nil if no match exists", %{link: link} do
+      Repo.delete!(link)
+      assert Links.visit_link_by_slug(link.slug) == nil
+    end
+
+    test "records initial count if match exists", %{link: link} do
+      id = link.id
+      query = from(v in Visit, where: [link_id: ^id])
+      refute Repo.exists?(query)
+      assert Links.visit_link_by_slug(link.slug) == link.original_url
+      assert %{count: 1} = Repo.get_by(Visit, link_id: link.id, date: Date.utc_today(), hour: Time.utc_now().hour)
+    end
+
+    test "increments existing count if match exists", %{link: link} do
+      count = Enum.random(3..10)
+      id = link.id
+      Repo.insert!(%Visit{link_id: id, hour: Time.utc_now().hour, date: Date.utc_today(), count: count - 1})
+      assert Links.visit_link_by_slug(link.slug) == link.original_url
+      assert %{count: ^count} = Repo.get_by(Visit, link_id: link.id, date: Date.utc_today(), hour: Time.utc_now().hour)
+    end
+
+    test "does not insert count if no match exists", %{link: link} do
+      Repo.delete!(link)
+      assert Links.visit_link_by_slug(link.slug) == nil
+      id = link.id
+      query = from(v in Visit, where: [link_id: ^id])
+      refute Repo.exists?(query)
     end
   end
 end
