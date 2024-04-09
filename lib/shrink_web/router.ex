@@ -10,6 +10,10 @@ defmodule ShrinkWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :authenticated do
+    plug ShrinkWeb.Plugs.CurrentUser
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
