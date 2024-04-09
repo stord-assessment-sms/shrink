@@ -43,6 +43,7 @@ defmodule Shrink.MixProject do
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:ex_machina, "~> 2.7.0", only: :test},
       {:excellent_migrations, "~> 0.1.8", only: [:dev, :test], runtime: false},
+      {:faker, "~> 0.18.0", only: :test},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
       {:heroicons,
