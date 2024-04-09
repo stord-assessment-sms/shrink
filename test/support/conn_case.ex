@@ -17,6 +17,8 @@ defmodule ShrinkWeb.ConnCase do
 
   use ExUnit.CaseTemplate
 
+  import Shrink.Factory
+
   using do
     quote do
       # The default endpoint for testing
@@ -35,6 +37,16 @@ defmodule ShrinkWeb.ConnCase do
 
   setup tags do
     Shrink.DataCase.setup_sandbox(tags)
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+
+    if tags[:authenticated] do
+      user =
+        Map.get_lazy(tags, :user, fn ->
+          insert(:user)
+        end)
+
+      {:ok, conn: Phoenix.ConnTest.init_test_session(Phoenix.ConnTest.build_conn(), %{user_id: user.id}), user: user}
+    else
+      {:ok, conn: Phoenix.ConnTest.build_conn()}
+    end
   end
 end
