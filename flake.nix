@@ -9,6 +9,8 @@
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    pre-commit.url = "github:hercules-ci/pre-commit-hooks.nix/flakeModule";
+    pre-commit.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs @ {
