@@ -39,6 +39,12 @@ defmodule Shrink.Links do
     Repo.one(Query.link_by_slug(slug))
   end
 
+  @doc "List `Link`s recently created by the given `User`"
+  @spec list_recent_links_by_user_id(User.id()) :: list(Link.t())
+  def list_recent_links_by_user_id(user_id) do
+    Repo.all(Query.recent_links_by_user_id(user_id))
+  end
+
   @doc "Record a visit to a `Link` by its slug, if that Link exists"
   @spec visit_link_by_slug(Link.slug()) :: Link.url() | nil
   def visit_link_by_slug(slug) do
