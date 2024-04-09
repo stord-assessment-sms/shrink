@@ -18,12 +18,12 @@ defmodule Shrink.DataCase do
 
   using do
     quote do
-      alias Shrink.Repo
-
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
       import Shrink.DataCase
+
+      alias Shrink.Repo
     end
   end
 
