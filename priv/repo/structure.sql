@@ -35,6 +35,20 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: links; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.links (
+    id uuid NOT NULL,
+    slug character varying(16) NOT NULL,
+    original_url character varying(255) NOT NULL,
+    user_id uuid NOT NULL,
+    inserted_at timestamp(0) without time zone NOT NULL,
+    updated_at timestamp(0) without time zone NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -64,6 +78,14 @@ COMMENT ON TABLE public.users IS 'Placeholder table for stubbed authz/authn impl
 
 
 --
+-- Name: links links_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.links
+    ADD CONSTRAINT links_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -80,10 +102,39 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: links_inserted_at_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX links_inserted_at_index ON public.links USING btree (inserted_at);
+
+
+--
+-- Name: links_original_url_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX links_original_url_index ON public.links USING btree (original_url);
+
+
+--
+-- Name: links_slug_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX links_slug_index ON public.links USING btree (slug);
+
+
+--
 -- Name: users_email_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX users_email_index ON public.users USING btree (email);
+
+
+--
+-- Name: links links_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.links
+    ADD CONSTRAINT links_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 
 --
@@ -92,3 +143,4 @@ CREATE UNIQUE INDEX users_email_index ON public.users USING btree (email);
 
 INSERT INTO public."schema_migrations" (version) VALUES (20240409135116);
 INSERT INTO public."schema_migrations" (version) VALUES (20240409143510);
+INSERT INTO public."schema_migrations" (version) VALUES (20240409201910);
