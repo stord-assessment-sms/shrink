@@ -11,6 +11,11 @@ config :shrink,
   ecto_repos: [Shrink.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
+config :shrink, Shrink.Repo,
+  migration_primary_key: [name: :id, type: :binary_id],
+  migration_foreign_key: [name: :id, type: :binary_id],
+  migration_timestamps: [type: :utc_datetime]
+
 # Configures the endpoint
 config :shrink, ShrinkWeb.Endpoint,
   url: [host: "localhost"],
