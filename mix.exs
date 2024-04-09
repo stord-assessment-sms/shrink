@@ -41,6 +41,7 @@ defmodule Shrink.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:ecto_psql_extras, "~> 0.7.15"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:excellent_migrations, "~> 0.1.8", only: [:dev, :test], runtime: false},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
       {:heroicons,
@@ -82,6 +83,7 @@ defmodule Shrink.MixProject do
       ci: [
         "format --check-formatted",
         "compile --all-warnings --warnings-as-errors",
+        "excellent_migrations.check_safety",
         "test --cover",
         "dialyzer",
         "credo",
