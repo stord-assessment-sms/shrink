@@ -28,6 +28,10 @@ defmodule ShrinkWeb.Router do
 
     get "/", LinkController, :new
     post "/links", LinkController, :create
+
+    get "/stats", StatsController, :index
+    get "/stats/download", StatsController, :download
+
     get "/:slug", LinkController, :show
   end
 

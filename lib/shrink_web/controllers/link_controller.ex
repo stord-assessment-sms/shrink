@@ -4,7 +4,7 @@ defmodule ShrinkWeb.LinkController do
   alias Shrink.Links
   alias Shrink.Links.Link
 
-  plug :require_user when action not in [:show]
+  plug ShrinkWeb.Plugs.RequireUser when action not in [:show]
 
   def new(conn, _params) do
     changeset = Links.change_link(%Link{})
@@ -29,7 +29,7 @@ defmodule ShrinkWeb.LinkController do
   end
 
   def show(conn, %{"slug" => slug}) do
-    case Links.get_link_by_slug(slug) do
+    case Links.visit_link_by_slug(slug) do
       nil ->
         conn
         |> put_status(:not_found)
@@ -39,18 +39,7 @@ defmodule ShrinkWeb.LinkController do
       link ->
         conn
         |> put_status(:moved_permanently)
-        |> redirect(external: link.original_url)
-    end
-  end
-
-  defp require_user(conn, _opts) do
-    if conn.private[:current_user] == nil do
-      conn
-      |> put_status(:unauthorized)
-      |> text("Unauthorized")
-      |> halt()
-    else
-      conn
+        |> redirect(external: link)
     end
   end
 end

@@ -1,0 +1,28 @@
+<h1 class="text-xl">Link Visits</h1>
+<span>
+  Granularity:
+  <.link :for={level <- ~w(total daily hourly)} href={"?granularity=#{level}"}>
+    <%= String.capitalize(level) %>
+  </.link>
+</span>
+<span class="float-right rounded-lg bg-zinc-300 p-2 hover:bg-zinc-100">
+  <.icon name="hero-arrow-down-tray" class="bg-zinc-900" />
+  <.link href={~p"/stats/download?granularity=#{@granularity}"}>Download as CSV</.link>
+</span>
+<.table id="link-stats" rows={@links}>
+  <:col :let={link} label="Slug">
+    <.link href={"/" <> link.slug}><%= link.slug %></.link>
+  </:col>
+  <:col :let={link} label="Original URL">
+    <.link href={link.original_url}><%= link.original_url %></.link>
+  </:col>
+  <:col :let={link} label="Visits">
+    <%= link.visits %>
+  </:col>
+  <:col :let={link} :if={@granularity != :total} label="Date (UTC)">
+    <%= link.date %>
+  </:col>
+  <:col :let={link} :if={@granularity == :hourly} label="Hour (UTC)">
+    <%= link.hour %>
+  </:col>
+</.table>
