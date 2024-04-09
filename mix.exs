@@ -107,6 +107,7 @@ defmodule Shrink.MixProject do
         Shrink.Release,
         # False-positive
         Shrink.DataCase,
+        Shrink.Factory,
         Shrink.Repo,
         ShrinkWeb.ConnCase,
         # Low-value

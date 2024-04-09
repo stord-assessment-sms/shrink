@@ -22,6 +22,7 @@ defmodule Shrink.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Shrink.DataCase
+      import Shrink.Factory
 
       alias Shrink.Repo
     end

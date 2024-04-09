@@ -26,6 +26,7 @@ defmodule ShrinkWeb.ConnCase do
 
       # Import conveniences for testing with connections
       import Plug.Conn
+      import Shrink.Factory
       import ShrinkWeb.ConnCase
 
       @endpoint ShrinkWeb.Endpoint
