@@ -20,8 +20,15 @@ defmodule ShrinkWeb.Router do
 
   scope "/", ShrinkWeb do
     pipe_through :browser
+    # anonymous routes only
+  end
 
-    get "/", PageController, :home
+  scope "/", ShrinkWeb do
+    pipe_through [:browser, :authenticated]
+
+    get "/", LinkController, :new
+    post "/links", LinkController, :create
+    get "/:slug", LinkController, :show
   end
 
   # Other scopes may use custom stacks.
