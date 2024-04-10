@@ -47,7 +47,7 @@ defmodule ShrinkWeb.StatsController do
     granularity = granularity_for(params)
     user_id = get_in(conn.private, [:current_user, Access.key(:id)])
     links = user_id |> Stats.link_stats_by_user_id(granularity) |> Repo.all()
-    render(conn, :index, granularity: granularity, links: links)
+    render(conn, :index, granularity: granularity, links: links, page_title: "Link Statistics")
   end
 
   for kind <- ~w(total daily hourly)a do
