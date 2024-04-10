@@ -12,9 +12,7 @@ defmodule Shrink.Application do
       Shrink.Repo,
       {DNSCluster, query: Application.get_env(:shrink, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Shrink.PubSub},
-      # Start a worker by calling: Shrink.Worker.start_link(arg)
-      # {Shrink.Worker, arg},
-      # Start to serve requests, typically the last entry
+      {PartitionSupervisor, child_spec: Shrink.Stats.VisitDebouncer, name: Shrink.Stats.VisitDebouncers},
       ShrinkWeb.Endpoint
     ]
 
