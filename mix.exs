@@ -61,6 +61,7 @@ defmodule Shrink.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:styler, "~> 0.11.9", only: [:dev, :test], runtime: false},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
+      {:tailwind_formatter, "~> 0.4.0", only: [:dev, :test], runtime: false},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"}
     ]
