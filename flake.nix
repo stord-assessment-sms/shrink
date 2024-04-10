@@ -33,7 +33,7 @@
           enable = true;
           devShell = {
             extraArgs.shellHook = config.pre-commit.installationScript;
-            extraPackages = [pkgs.flyctl];
+            extraPackages = with pkgs; [flyctl oha];
             languageServers.elixir = true;
             languageServers.erlang = false;
             phoenix = true;
