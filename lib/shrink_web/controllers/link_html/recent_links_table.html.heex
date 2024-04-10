@@ -2,6 +2,16 @@
   <h3 class="text-xl">Recent Links</h3>
   <.table id="recent-links" rows={@links}>
     <:col :let={link} label="Slug">
+      <.link
+        phx-click={JS.dispatch("phx:copy-to-clipboard")}
+        data-copy={short_url(@conn, link)}
+        href="#"
+      >
+        <.icon
+          name="hero-clipboard-document"
+          class="bg-zinc-300 group-hover:bg-zinc-900 group-active:bg-sky-600"
+        />
+      </.link>
       <.link href={short_url(@conn, link)}><%= link.slug %></.link>
     </:col>
     <:col :let={link} label="Original URL">
