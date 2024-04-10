@@ -15,7 +15,11 @@ defmodule Shrink.Application do
       {DNSCluster, query: Application.get_env(:shrink, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Shrink.PubSub},
       {PartitionSupervisor, child_spec: Shrink.Stats.VisitDebouncer, name: Shrink.Stats.VisitDebouncers},
-      {Cachex, interval: 15_000, limit: limit(size: 500, reclaim: 0.1), name: Shrink.Links},
+      {Cachex,
+       interval: 15_000,
+       limit: limit(size: 500, reclaim: 0.1),
+       name: Shrink.Links,
+       warmers: [warmer(module: Shrink.Links.CacheWarmer, state: Shrink.Repo)]},
       ShrinkWeb.Endpoint
     ]
 
