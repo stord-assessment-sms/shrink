@@ -37,6 +37,7 @@ defmodule Shrink.MixProject do
       {:bandit, "~> 1.2"},
       {:credo, "~> 1.7.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
+      {:easyhtml, "~> 0.3.2", only: :test},
       {:dns_cluster, "~> 0.1.1"},
       {:ecto_sql, "~> 3.10"},
       {:ecto_psql_extras, "~> 0.7.15"},
