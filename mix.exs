@@ -35,6 +35,7 @@ defmodule Shrink.MixProject do
   defp deps do
     [
       {:bandit, "~> 1.2"},
+      {:cachex, "~> 3.6.0"},
       {:credo, "~> 1.7.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
       {:easyhtml, "~> 0.3.2", only: :test},
