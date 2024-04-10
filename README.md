@@ -1,18 +1,20 @@
-# Shrink
+## Mise Prereqs
 
-To start your Phoenix server:
+```shell
+# mise
+brew install autoconf mise openssl
+# erlang prereqs
+brew install autoconf mise openssl
+# optional: for observer
+brew install wxwidgets
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+# mise + cargo + cargo-binstall + oha + erlang +elixir
+mise settings set experimental true
+mise install
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+# install oha via homebrew instead
+brew install oha
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+# For `mix deps.get` segfaults on ARM + Erlang 26.2.3
+mix archive.install github hexpm/hex branch latest
+```
