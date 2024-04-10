@@ -1,5 +1,5 @@
 defmodule ShrinkWeb.LinkControllerTest do
-  use ShrinkWeb.ConnCase, async: true
+  use ShrinkWeb.ConnCase, async: false
 
   import Shrink.HtmlHelpers
 

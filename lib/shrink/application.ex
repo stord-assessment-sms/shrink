@@ -5,6 +5,8 @@ defmodule Shrink.Application do
 
   use Application
 
+  import Cachex.Spec
+
   @impl true
   def start(_type, _args) do
     children = [
@@ -13,6 +15,7 @@ defmodule Shrink.Application do
       {DNSCluster, query: Application.get_env(:shrink, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Shrink.PubSub},
       {PartitionSupervisor, child_spec: Shrink.Stats.VisitDebouncer, name: Shrink.Stats.VisitDebouncers},
+      {Cachex, interval: 15_000, limit: limit(size: 500, reclaim: 0.1), name: Shrink.Links},
       ShrinkWeb.Endpoint
     ]
 

@@ -5,8 +5,8 @@ defmodule Shrink.Links do
 
   alias Shrink.Links.Link
   alias Shrink.Links.Query
-  alias Shrink.Links.Visit
   alias Shrink.Repo
+  alias Shrink.Stats.VisitDebouncer
   alias Shrink.Users.User
 
   require Logger
@@ -48,28 +48,31 @@ defmodule Shrink.Links do
   @doc "Record a visit to a `Link` by its slug, if that Link exists"
   @spec visit_link_by_slug(Link.slug()) :: Link.url() | nil
   def visit_link_by_slug(slug) do
-    fn repo ->
-      case repo.one(Query.link_by_slug(slug)) do
-        nil ->
-          nil
-
-        link ->
-          repo.insert(%Visit{link_id: link.id, date: Date.utc_today(), hour: Time.utc_now().hour, count: 1},
-            conflict_target: [:link_id, :date, :hour],
-            on_conflict: [inc: [count: 1]]
-          )
-
-          link.original_url
+    __MODULE__
+    |> Cachex.fetch(slug, fn slug ->
+      case Repo.one(Query.link_by_slug(slug)) do
+        nil -> {:commit, nil, ttl: :timer.seconds(1)}
+        link -> {:commit, link, ttl: :timer.minutes(5)}
       end
-    end
-    |> Repo.transaction()
+    end)
     |> case do
-      {:ok, maybe_url} ->
-        maybe_url
-
-      {:error, _changeset} ->
-        Logger.error("Could not record visit for slug #{slug}")
+      {:ok, nil} ->
         nil
+
+      {:commit, nil, _opts} ->
+        nil
+
+      {:error, %Cachex.ExecutionError{}} ->
+        Logger.error("Cachex errored during visit_link_by_slug/1 for slug #{slug}")
+        nil
+
+      {:commit, link, _opts} ->
+        VisitDebouncer.visit(link.slug)
+        link.original_url
+
+      {:ok, link} ->
+        VisitDebouncer.visit(link.slug)
+        link.original_url
     end
   end
 end
