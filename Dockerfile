@@ -45,6 +45,10 @@ RUN mkdir config
 COPY config/config.exs config/${MIX_ENV}.exs config/
 RUN mix deps.compile
 
+# download Hex-packaged binaries to cache them
+RUN mix esbuild.install
+RUN mix tailwind.install
+
 COPY priv priv
 
 COPY lib lib
@@ -55,7 +59,7 @@ COPY assets assets
 RUN mix assets.deploy
 
 # Compile the release
-RUN mix compile
+RUN mix compile --all-warnings --warnings-as-errors
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs config/
