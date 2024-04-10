@@ -20,6 +20,9 @@ config :shrink, ShrinkWeb.Endpoint,
   secret_key_base: "4iwesR0xOizHTqFbl8dV4B5lncArE1nDeZV5AOvQllWbloz7NN1x19CyceAnx/Un",
   server: false
 
+# Manual flushes only
+config :shrink, Shrink.Stats.VisitDebouncer, debounce_interval_ms: :infinity
+
 # Print only warnings and errors during test
 config :logger, level: :warning
 
