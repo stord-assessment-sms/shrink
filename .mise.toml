@@ -1,0 +1,6 @@
+[tools]
+"cargo:cargo-binstall" = "latest"
+"cargo:oha" = "1.4.1"
+elixir = "1.16.2-otp-26"
+erlang = "26.2.3"
+rust = "stable"
