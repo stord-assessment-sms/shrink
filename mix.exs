@@ -109,6 +109,7 @@ defmodule Shrink.MixProject do
         ShrinkWeb.Gettext,
         # Deploy-only
         Shrink.Release,
+        ~r/^Shrink\.Release\./,
         # False-positive
         Shrink.DataCase,
         Shrink.Factory,
