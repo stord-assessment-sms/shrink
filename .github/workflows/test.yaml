@@ -1,0 +1,89 @@
+name: Tests
+on:
+  push:
+    branches:
+      - "main"
+      - "develop"
+      - "feature/**"
+
+env:
+  MIX_ENV: test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:15.6-alpine
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+        name: Check out repository
+      - uses: erlef/setup-beam@v1.17
+        id: beam
+        name: Install BEAM languages
+        with:
+          version-file: .tool-versions
+          version-type: strict
+      - uses: actions/cache@v4
+        id: mix-deps
+        name: Cache Hex Dependencies
+        with:
+          key: mix-deps-{{ runner.os }}-{{ env.MIX_ENV }}-${{ hashFiles('mix.lock') }}
+          path: deps
+      - run: mix deps.get
+        name: Download Hex Dependencies
+      - uses: actions/cache@v4
+        id: mix-compiled-deps
+        name: Cache Compiled Dependencies
+        with:
+          key: mix-compiled-deps-{{ runner.os }}-{{ env.MIX_ENV }}-${{ hashFiles('mix.lock') }}
+          path: _build/{{ env.MIX_ENV }}
+      - run: mix deps.compile
+        name: Compile Hex Dependencies
+      - run: mix format --check-formatted
+        name: Check Elixir formatting
+      - run: mix compile --all-warnings --warnings-as-errors
+        name: Compile Application
+      - run: mix test --cover
+        name: ExUnit Tests
+      - uses: actions/cache/restore@v4
+        id: dialyzer-plts-restore
+        name: Restore Dialyzer Cache
+        with:
+          key: |
+            plt-${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            plt-${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-
+          path: |
+            build/plts
+      - run: mix dialyzer --plt
+        if: steps.dialyzer-plts-restore.outputs.cache-hit != 'true'
+        name: Build Dialyzer lookup tables
+      - uses: actions/cache/save@v4
+        id: dialyzer-plts-publish
+        if: steps.dialyzer-plts-restore.outputs.cache-hit != 'true'
+        name: Save Dialyzer Cache
+        with:
+          key: |
+            plt-${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            plt-${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-
+          path: |
+            build/plts
+      - run: mix dialyzer --format github
+        name: Run Dialyzer analysis
+      - run: mix credo suggest --format oneline
+        name: Run Credo lints
+      - run: mix excellent_migrations.check_safety
+        name: Check migrations safety
+      - run: mix xref graph --label compile --format cycles --fail-above 0
+        name: Check for inter-module dependency cycles
