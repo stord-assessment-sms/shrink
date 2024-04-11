@@ -51,6 +51,7 @@ defmodule Shrink.MixProject do
       {:heroicons,
        github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1},
       {:jason, "~> 1.2"},
+      {:logger_json, "~> 5.1.4"},
       {:nimble_csv, "~> 1.2.0"},
       {:phoenix, "~> 1.7.11"},
       {:phoenix_ecto, "~> 4.4"},
