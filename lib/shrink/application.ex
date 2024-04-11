@@ -7,6 +7,10 @@ defmodule Shrink.Application do
 
   import Cachex.Spec
 
+  require Logger
+
+  @idle_interval Application.compile_env(:shrink, [:idle_shutdown_interval], :timer.seconds(60))
+
   @impl true
   def start(_type, _args) do
     children = [
@@ -20,7 +24,8 @@ defmodule Shrink.Application do
        limit: limit(size: 500, reclaim: 0.1),
        name: Shrink.Links,
        warmers: [warmer(module: Shrink.Links.CacheWarmer, state: Shrink.Repo)]},
-      ShrinkWeb.Endpoint
+      ShrinkWeb.Endpoint,
+      {Task, fn -> idle_shutdown(@idle_interval) end}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -35,5 +40,19 @@ defmodule Shrink.Application do
   def config_change(changed, _new, removed) do
     ShrinkWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  def idle_shutdown(interval) do
+    Process.sleep(interval)
+    {:ok, bandit_supervisor} = Bandit.PhoenixAdapter.bandit_pid(ShrinkWeb.Endpoint)
+    {:ok, conns} = ThousandIsland.connection_pids(bandit_supervisor)
+
+    if conns == [] do
+      Logger.info("No connections, shutting down...")
+      ThousandIsland.suspend(bandit_supervisor)
+      System.halt(0)
+    else
+      idle_shutdown(interval)
+    end
   end
 end
